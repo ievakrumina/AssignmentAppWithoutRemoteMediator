@@ -1,3 +1,10 @@
 <resources>
-    <string name="app_name">AssignmentAppWithoutRemoteMediator</string>
+    <string name="app_name">App without remote mediator</string>
+    <string name="error_message">Something went wrong.</string>
+    <string name="loading_message">Data is loading</string>
+    <string name="view_repo_url">Go to repository</string>
+    <string name="working_offline_message">You are working offline</string>
+    <string name="retry">Retry</string>
+    <string name="network_available">Back online</string>
+    <string name="no_data">No repository data to show</string>
 </resources>

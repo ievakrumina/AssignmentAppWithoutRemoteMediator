@@ -46,7 +46,7 @@ class RepoAdapter(private val listener: OnItemClickedListener) :
         itemName.text = item.name
         itemAvatarImage.load(item.owner.avatar.toUri().buildUpon().scheme("https").build()) {
           crossfade(true)
-          //error(R.drawable.image_placeholder)
+          error(R.drawable.image_placeholder)
         }
 
         handlePrivacy(item)

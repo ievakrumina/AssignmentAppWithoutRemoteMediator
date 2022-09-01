@@ -26,30 +26,30 @@ class SingleRepoFragment: Fragment(R.layout.fragment_single_repo) {
 
     val binding = FragmentSingleRepoBinding.bind(view)
     binding.apply {
-      singleRepoAvatarImage.load(args.value.singleRepo?.owner?.avatar?.toUri()?.buildUpon()?.scheme("https")?.build()) {
+      singleRepoAvatarImage.load(args.value.singleRepo.owner.avatar.toUri().buildUpon()?.scheme("https")?.build()) {
         crossfade(true)
         error(R.drawable.image_placeholder)
       }
-      singleRepoFullName.text = args.value.singleRepo?.fullName
-      singleRepoDescription.text = args.value.singleRepo?.description
+      singleRepoFullName.text = args.value.singleRepo.fullName
+      singleRepoDescription.text = args.value.singleRepo.description
       handlePrivacy()
       handleVisibility()
 
       singleRepoButton.setOnClickListener {
-        handleOpenUrl(args.value.singleRepo?.url)
+        handleOpenUrl(args.value.singleRepo.url)
       }
     }
   }
 
   private fun FragmentSingleRepoBinding.handleVisibility() {
-    when (viewModel.getVisibility(args.value.singleRepo?.visibility)) {
+    when (viewModel.getVisibility(args.value.singleRepo.visibility)) {
       Visibility.PUBLIC -> singleRepoVisibility.load(R.drawable.ic_visibility)
       Visibility.PRIVATE -> singleRepoVisibility.load(R.drawable.ic_visibility_off)
     }
   }
 
   private fun FragmentSingleRepoBinding.handlePrivacy() {
-    if (args.value.singleRepo?.privacy == true) {
+    if (args.value.singleRepo.privacy) {
       singleRepoPrivacy.load(R.drawable.ic_private)
     } else {
       singleRepoPrivacy.load(R.drawable.ic_public)

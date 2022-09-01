@@ -9,5 +9,20 @@
         android:name="com.ik.android.assignmentappwithoutremotemediator.ui.repolist.RepoListFragment"
         android:label="@string/app_name"
         tools:layout="@layout/fragment_repo_list" >
+        <action
+            android:id="@+id/action_repoListFragment_to_singleRepoFragment"
+            app:destination="@id/singleRepoFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/singleRepoFragment"
+        android:name="com.ik.android.assignmentappwithoutremotemediator.ui.singleRepo.SingleRepoFragment"
+        android:label="{name}"
+        tools:layout="@layout/fragment_single_repo" >
+        <argument
+            android:name="name"
+            app:argType="string"/>
+        <argument
+            android:name="singleRepo"
+            app:argType="com.ik.android.assignmentappwithoutremotemediator.data.model.RepoData" />
     </fragment>
 </navigation>

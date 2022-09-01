@@ -4,10 +4,12 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ik.android.assignmentappwithoutremotemediator.R
 import com.ik.android.assignmentappwithoutremotemediator.databinding.FragmentRepoListBinding
 import com.ik.android.assignmentappwithoutremotemediator.data.model.RepoData
+import com.ik.android.assignmentappwithoutremotemediator.ui.repolist.RepoListFragmentDirections.Companion.actionRepoListFragmentToSingleRepoFragment
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -35,7 +37,7 @@ class RepoListFragment : Fragment(R.layout.fragment_repo_list), RepoAdapter.OnIt
   }
 
   override fun onItemClicked(repoData: RepoData) {
-    //val action = RepoListFragmentDirections.actionRepoListFragmentToSingleRepoFragment(repoData.name, repoData)
-    //view?.findNavController()?.navigate(action)
+    val action = actionRepoListFragmentToSingleRepoFragment(repoData.name,repoData)
+    view?.findNavController()?.navigate(action)
   }
 }

@@ -1,25 +1,21 @@
 package com.ik.android.assignmentappwithoutremotemediator.data.paging
 
+import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.ik.android.assignmentappwithoutremotemediator.common.Constants.ITEMS_PER_PAGE
 import com.ik.android.assignmentappwithoutremotemediator.common.Constants.STARTING_PAGE
-import com.ik.android.assignmentappwithoutremotemediator.common.getSuccessOrNull
+import com.ik.android.assignmentappwithoutremotemediator.common.getResourceResult
 import com.ik.android.assignmentappwithoutremotemediator.data.model.RepoData
 import com.ik.android.assignmentappwithoutremotemediator.data.repository.MainRepository
-import retrofit2.HttpException
-import java.io.IOException
+import java.lang.Exception
 import javax.inject.Inject
 
 class RepoListPagingSource @Inject constructor(
     private val repository: MainRepository
   ) : PagingSource<Int, RepoData>() {
     override fun getRefreshKey(state: PagingState<Int, RepoData>): Int? {
+      // refresh key close to the last accessed item
       return state.anchorPosition?.let { anchorPosition ->
-        // This loads starting from previous page, but since PagingConfig.initialLoadSize spans
-        // multiple pages, the initial load will still load items centered around
-        // anchorPosition. This also prevents needing to immediately launch prepend due to
-        // prefetchDistance.
         state.closestPageToPosition(anchorPosition)?.prevKey
       }
     }
@@ -27,17 +23,20 @@ class RepoListPagingSource @Inject constructor(
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, RepoData> {
       // Start paging with the STARTING_PAGE if this is the first load
       val page = params?.key ?: STARTING_PAGE
-      return try {
-        val repoData = repository.getRepos(page = page, item = params.loadSize).getSuccessOrNull()
+      Log.d("Test", "page: $page and ${params?.key}")
+      val response = repository.getRepos(page = page, item = params.loadSize).getResourceResult()
+      return if (response.first != null) {
+        val repoData = response.first!!
         LoadResult.Page(
-          data = repoData ?: emptyList() ,
+          data = repoData,
           prevKey = if (page == STARTING_PAGE) null else page - 1,
-          nextKey = if (repoData.isNullOrEmpty()) null else page + 1
+          nextKey = if (repoData.isEmpty()) null else page + 1
         )
-      } catch (e: IOException) {
-        LoadResult.Error(e)
-      } catch (e: HttpException) {
-        LoadResult.Error(e)
+      } else {
+        when (response.second) {
+          null -> LoadResult.Error(Exception("Generic exception"))
+          else -> LoadResult.Error(response.second!!)
+        }
       }
     }
   }

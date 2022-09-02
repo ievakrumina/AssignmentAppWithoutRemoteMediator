@@ -1,5 +1,6 @@
 package com.ik.android.assignmentappwithoutremotemediator.data.repository
 
+import android.util.Log
 import com.ik.android.assignmentappwithoutremotemediator.common.Resource
 import com.ik.android.assignmentappwithoutremotemediator.common.asSuccess
 import com.ik.android.assignmentappwithoutremotemediator.data.model.RepoData
@@ -15,6 +16,5 @@ class MainRepositoryImpl @Inject constructor(private val service: RepoApiService
       Resource.Error(exception)
     } catch (exception: HttpException) {
       Resource.Error(exception)
-
   }
 }

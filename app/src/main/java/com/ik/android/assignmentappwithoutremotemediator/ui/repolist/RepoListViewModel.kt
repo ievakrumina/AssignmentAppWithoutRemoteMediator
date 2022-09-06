@@ -7,6 +7,7 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.ik.android.assignmentappwithoutremotemediator.data.model.RepoData
 import com.ik.android.assignmentappwithoutremotemediator.domain.RepoListUseCase
+import com.ik.android.assignmentappwithoutremotemediator.util.ConnectivityObserver
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -31,6 +32,10 @@ class RepoListViewModel @Inject constructor(private val repoListUseCase: RepoLis
   private val _listState = MutableLiveData<RepoListState>()
   val listState: LiveData<RepoListState>
     get() = _listState
+
+  private var _networkStatus: ConnectivityObserver.Status? = null
+  val networkStatus: ConnectivityObserver.Status?
+    get() = _networkStatus
 
   fun setListState(state: CombinedLoadStates) {
     val transformedState = when (state.source.refresh) {
@@ -57,5 +62,13 @@ class RepoListViewModel @Inject constructor(private val repoListUseCase: RepoLis
    */
   fun getRepoList(): LiveData<PagingData<RepoData>> =
     repoListUseCase.getRepoList().cachedIn(viewModelScope).asLiveData()
+
+  /**
+   * Set network status.
+   * Status will be observed in fragment to trigger automatic retry
+   */
+  fun setNetworkStatus(status: ConnectivityObserver.Status) {
+    _networkStatus = status
+  }
 
 }

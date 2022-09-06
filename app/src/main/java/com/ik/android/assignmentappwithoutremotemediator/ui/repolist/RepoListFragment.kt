@@ -7,13 +7,17 @@ import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ik.android.assignmentappwithoutremotemediator.R
 import com.ik.android.assignmentappwithoutremotemediator.databinding.FragmentRepoListBinding
 import com.ik.android.assignmentappwithoutremotemediator.data.model.RepoData
 import com.ik.android.assignmentappwithoutremotemediator.ui.repolist.RepoListFragmentDirections.Companion.actionRepoListFragmentToSingleRepoFragment
+import com.ik.android.assignmentappwithoutremotemediator.util.ConnectivityObserver
+import com.ik.android.assignmentappwithoutremotemediator.util.NetworkConnectivityObserver
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 private const val TAG = "RepoListFragment"
 
@@ -22,9 +26,12 @@ class RepoListFragment : Fragment(R.layout.fragment_repo_list), RepoAdapter.OnIt
 
   private val viewModel: RepoListViewModel by viewModels()
 
+  private lateinit var connectivityObserver: ConnectivityObserver
+
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
+    connectivityObserver = NetworkConnectivityObserver(requireContext())
     val binding = FragmentRepoListBinding.bind(view)
     val repoAdapter = RepoAdapter(this)
 
@@ -35,6 +42,8 @@ class RepoListFragment : Fragment(R.layout.fragment_repo_list), RepoAdapter.OnIt
         setHasFixedSize(true)
       }
     }
+
+    observeNetworkStates(repoAdapter)
 
     // Send load state from pagingAdapter to viewModel to map different UI view states
     repoAdapter.addLoadStateListener { loadState ->
@@ -129,5 +138,27 @@ class RepoListFragment : Fragment(R.layout.fragment_repo_list), RepoAdapter.OnIt
   override fun onItemClicked(repoData: RepoData) {
     val action = actionRepoListFragmentToSingleRepoFragment(repoData.name, repoData)
     view?.findNavController()?.navigate(action)
+  }
+
+  private fun observeNetworkStates(repoAdapter: RepoAdapter) {
+    viewLifecycleOwner.lifecycleScope.launch {
+      connectivityObserver.observe().collect { status ->
+        viewModel.setNetworkStatus(status)
+        Log.d(TAG, "$status")
+        when(status) {
+          ConnectivityObserver.Status.Available -> handleNetworkAvailable(repoAdapter, status)
+          ConnectivityObserver.Status.Unavailable -> {}
+          ConnectivityObserver.Status.Losing -> {}
+          ConnectivityObserver.Status.Lost -> {}
+        }
+      }
+    }
+  }
+
+  private fun handleNetworkAvailable(repoAdapter: RepoAdapter, status: ConnectivityObserver.Status) {
+    if (viewModel.networkStatus == status) {
+      Toast.makeText(context, R.string.network_available, Toast.LENGTH_SHORT).show()
+      repoAdapter.retry()
+    }
   }
 }

@@ -23,7 +23,6 @@ class RepoListPagingSource @Inject constructor(
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, RepoData> {
       // Start paging with the STARTING_PAGE if this is the first load
       val page = params?.key ?: STARTING_PAGE
-      Log.d("Test", "page: $page and ${params?.key}")
       val response = repository.getRepos(page = page, item = params.loadSize).getResourceResult()
       return if (response.first != null) {
         val repoData = response.first!!

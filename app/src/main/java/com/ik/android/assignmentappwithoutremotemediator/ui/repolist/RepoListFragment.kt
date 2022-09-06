@@ -7,17 +7,15 @@ import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
-import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ik.android.assignmentappwithoutremotemediator.R
 import com.ik.android.assignmentappwithoutremotemediator.databinding.FragmentRepoListBinding
 import com.ik.android.assignmentappwithoutremotemediator.data.model.RepoData
 import com.ik.android.assignmentappwithoutremotemediator.ui.repolist.RepoListFragmentDirections.Companion.actionRepoListFragmentToSingleRepoFragment
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
+
+private const val TAG = "RepoListFragment"
 
 @AndroidEntryPoint
 class RepoListFragment : Fragment(R.layout.fragment_repo_list), RepoAdapter.OnItemClickedListener {
@@ -38,7 +36,63 @@ class RepoListFragment : Fragment(R.layout.fragment_repo_list), RepoAdapter.OnIt
       }
     }
 
-    viewLifecycleOwner.lifecycleScope.launch {
+    // Send load state from pagingAdapter to viewModel to map different UI view states
+    repoAdapter.addLoadStateListener { loadState ->
+      viewModel.setListState(loadState)
+    }
+
+    // Observe the list UI states from viewModel
+    viewModel.listState.observe(viewLifecycleOwner) { state ->
+      when (state) {
+        is RepoListViewModel.RepoListState.Error -> {
+          binding.apply {
+            // Handle error states
+            if (state.type == RepoListViewModel.LoadingStates.InitialLoad) {
+              errorState.isVisible = true
+            } else {
+              errorState.isVisible = false
+              Toast.makeText(context, R.string.error_message, Toast.LENGTH_SHORT).show()
+            }
+            // Disable loading state
+            loadingProgress.isVisible = false
+            prependProgress.isVisible = false
+            appendProgress.isVisible = false
+          }
+        }
+        is RepoListViewModel.RepoListState.Loading -> {
+          binding.apply {
+            // Handle loading states
+            appendProgress.isVisible = state.type == RepoListViewModel.LoadingStates.AppendLoad
+            prependProgress.isVisible = state.type == RepoListViewModel.LoadingStates.PrependLoad
+            loadingProgress.isVisible = state.type == RepoListViewModel.LoadingStates.InitialLoad
+
+            // Disable error state
+            errorState.isVisible = false
+
+            // Disable empty state
+            emptyList.isVisible = false
+          }
+        }
+        RepoListViewModel.RepoListState.Present -> {
+          binding.apply {
+            // Handle list states
+            emptyList.isVisible = repoAdapter.itemCount == 0
+            repoList.isVisible = repoAdapter.itemCount > 0
+
+            // Disable loading states
+            loadingProgress.isVisible = false
+            prependProgress.isVisible = false
+            appendProgress.isVisible = false
+
+            // Disable error state
+            errorState.isVisible = false
+          }
+        }
+      }
+    }
+
+    // Old implementation
+    /*viewLifecycleOwner.lifecycleScope.launch {
       repoAdapter.loadStateFlow.collectLatest { state ->
         Log.d("Test", "$state")
         // Show loading wheel, refresh == loading
@@ -64,8 +118,9 @@ class RepoListFragment : Fragment(R.layout.fragment_repo_list), RepoAdapter.OnIt
           }
         }
       }
-    }
+    } */
 
+    // Submit list data to paging adapter
     viewModel.getRepoList().observe(viewLifecycleOwner) {
       repoAdapter.submitData(lifecycle = lifecycle, pagingData = it)
     }

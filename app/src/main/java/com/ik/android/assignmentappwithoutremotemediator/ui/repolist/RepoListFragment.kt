@@ -54,48 +54,13 @@ class RepoListFragment : Fragment(R.layout.fragment_repo_list), RepoAdapter.OnIt
     viewModel.listState.observe(viewLifecycleOwner) { state ->
       when (state) {
         is RepoListViewModel.RepoListState.Error -> {
-          binding.apply {
-            // Handle error states
-            if (state.type == RepoListViewModel.LoadingStates.InitialLoad) {
-              errorState.isVisible = true
-            } else {
-              errorState.isVisible = false
-              Toast.makeText(context, R.string.error_message, Toast.LENGTH_SHORT).show()
-            }
-            // Disable loading state
-            loadingProgress.isVisible = false
-            prependProgress.isVisible = false
-            appendProgress.isVisible = false
-          }
+          handleErrorState(binding, state)
         }
         is RepoListViewModel.RepoListState.Loading -> {
-          binding.apply {
-            // Handle loading states
-            appendProgress.isVisible = state.type == RepoListViewModel.LoadingStates.AppendLoad
-            prependProgress.isVisible = state.type == RepoListViewModel.LoadingStates.PrependLoad
-            loadingProgress.isVisible = state.type == RepoListViewModel.LoadingStates.InitialLoad
-
-            // Disable error state
-            errorState.isVisible = false
-
-            // Disable empty state
-            emptyList.isVisible = false
-          }
+          handleLoadingState(binding, state)
         }
         RepoListViewModel.RepoListState.Present -> {
-          binding.apply {
-            // Handle list states
-            emptyList.isVisible = repoAdapter.itemCount == 0
-            repoList.isVisible = repoAdapter.itemCount > 0
-
-            // Disable loading states
-            loadingProgress.isVisible = false
-            prependProgress.isVisible = false
-            appendProgress.isVisible = false
-
-            // Disable error state
-            errorState.isVisible = false
-          }
+          handlePresentState(binding, repoAdapter)
         }
       }
     }
@@ -132,6 +97,62 @@ class RepoListFragment : Fragment(R.layout.fragment_repo_list), RepoAdapter.OnIt
     // Submit list data to paging adapter
     viewModel.getRepoList().observe(viewLifecycleOwner) {
       repoAdapter.submitData(lifecycle = lifecycle, pagingData = it)
+    }
+  }
+
+  private fun handlePresentState(
+    binding: FragmentRepoListBinding,
+    repoAdapter: RepoAdapter
+  ) {
+    binding.apply {
+      // Handle list states
+      emptyList.isVisible = repoAdapter.itemCount == 0
+      repoList.isVisible = repoAdapter.itemCount > 0
+
+      // Disable loading states
+      loadingProgress.isVisible = false
+      prependProgress.isVisible = false
+      appendProgress.isVisible = false
+
+      // Disable error state
+      errorState.isVisible = false
+    }
+  }
+
+  private fun handleLoadingState(
+    binding: FragmentRepoListBinding,
+    state: RepoListViewModel.RepoListState.Loading
+  ) {
+    binding.apply {
+      // Handle loading states
+      appendProgress.isVisible = state.type == RepoListViewModel.LoadingStates.AppendLoad
+      prependProgress.isVisible = state.type == RepoListViewModel.LoadingStates.PrependLoad
+      loadingProgress.isVisible = state.type == RepoListViewModel.LoadingStates.InitialLoad
+
+      // Disable error state
+      errorState.isVisible = false
+
+      // Disable empty state
+      emptyList.isVisible = false
+    }
+  }
+
+  private fun handleErrorState(
+    binding: FragmentRepoListBinding,
+    state: RepoListViewModel.RepoListState.Error
+  ) {
+    binding.apply {
+      // Handle error states
+      if (state.type == RepoListViewModel.LoadingStates.InitialLoad) {
+        errorState.isVisible = true
+      } else {
+        errorState.isVisible = false
+        Toast.makeText(context, R.string.error_message, Toast.LENGTH_SHORT).show()
+      }
+      // Disable loading state
+      loadingProgress.isVisible = false
+      prependProgress.isVisible = false
+      appendProgress.isVisible = false
     }
   }
 

@@ -1,6 +1,5 @@
 # Repository app without caching
-!! Work in progress
-A simple application to learn and demonstrate knowledge about - displaying data from Rest API, usage of paging 3 library as well as MVVM architecture.
+<h4>! Work in progress</h4> A simple application to learn and demonstrate knowledge about - displaying data from Rest API, usage of paging 3 library as well as MVVM architecture.
 
 <h2>Libraries</h2>
 <ul>

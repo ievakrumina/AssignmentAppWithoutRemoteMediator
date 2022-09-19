@@ -14,6 +14,11 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object RepositoryModule {
 
+  /**
+   * Use singleton, because repository is used by the app all the time.
+   * Repository will be created once for app lifecycle.
+   * This avoids creating new instance everytime user goes back to main repo list
+   */
   @Singleton
   @Provides
   fun provideMainRepositoryImpl(service: RepoApiService) = MainRepositoryImpl(service) as MainRepository

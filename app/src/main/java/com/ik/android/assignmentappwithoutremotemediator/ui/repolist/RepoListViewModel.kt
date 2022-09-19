@@ -59,6 +59,7 @@ class RepoListViewModel @Inject constructor(private val repoListUseCase: RepoLis
   /**
    * Used cachedIn(viewModelScope) so that after configuration change
    * fragment received already cached data.
+   * ViewModelScope - linked to this viewModel lifecycle
    */
   fun getRepoList(): LiveData<PagingData<RepoData>> =
     repoListUseCase.getRepoList().cachedIn(viewModelScope).asLiveData()

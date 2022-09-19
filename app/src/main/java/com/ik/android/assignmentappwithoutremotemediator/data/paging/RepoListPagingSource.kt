@@ -1,6 +1,5 @@
 package com.ik.android.assignmentappwithoutremotemediator.data.paging
 
-import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.ik.android.assignmentappwithoutremotemediator.common.Constants.STARTING_PAGE

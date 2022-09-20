@@ -21,3 +21,9 @@ fun <T> Resource<T>.getResourceResult(): Pair<T?, Throwable?> = when (this) {
   is Resource.Loading -> Pair(this.data, null)
   is Resource.Success -> Pair(this.data, null)
 }
+
+fun <T> Resource<T>.getErrorOrNull() = if (this is Resource.Error) {
+  this.error
+} else {
+  null
+}

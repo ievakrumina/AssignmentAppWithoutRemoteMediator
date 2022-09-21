@@ -1,7 +1,7 @@
 package com.ik.android.assignmentappwithoutremotemediator.data.paging
 
+
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.paging.LoadState
 import androidx.paging.PagingSource
 import com.ik.android.assignmentappwithoutremotemediator.common.Resource
 import com.ik.android.assignmentappwithoutremotemediator.common.asSuccess
@@ -11,7 +11,6 @@ import com.ik.android.assignmentappwithoutremotemediator.rules.MainDispatcherRul
 import com.ik.android.assignmentappwithoutremotemediator.testdata.TestData.testRepo
 import io.mockk.coEvery
 import io.mockk.mockk
-import io.mockk.mockkStatic
 import io.mockk.unmockkAll
 import kotlinx.coroutines.test.runTest
 import org.junit.*
@@ -67,7 +66,6 @@ class RepoListPagingSourceTest {
   fun `load returns generic error`() = runTest {
     coEvery { repositoryImpl.getRepos(any(), any()) } returns Resource.Error()
 
-    val expected = PagingSource.LoadResult.Error<Int, RepoData>(throwable=Exception("Generic exception"))
     val actual = source.load(
       PagingSource.LoadParams.Refresh(
         key = null,

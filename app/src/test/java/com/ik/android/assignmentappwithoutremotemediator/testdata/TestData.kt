@@ -7,5 +7,6 @@ object TestData {
 
   private val testOwner = OwnerData("id", "avatar")
   val testRepo = RepoData("id", "name","full name", "description", "url", testOwner, true, "Private")
+  val testRepoTwo = testRepo.copy("id2")
 
 }

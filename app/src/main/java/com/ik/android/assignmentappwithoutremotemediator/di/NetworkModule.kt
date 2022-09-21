@@ -6,6 +6,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -18,10 +19,23 @@ object NetworkModule {
 
   @Singleton
   @Provides
-  fun provideHttpClient() : OkHttpClient {
-    val logger = HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BASIC }
+  fun provideRepoApiInterceptor() = Interceptor { chain ->
+    val requestBuilder = chain.request().newBuilder()
+    val newRequest = requestBuilder
+    /*
+    requestBuilder.addHeader("Authorization", "Bearer XX")
+     */
+
+    chain.proceed(newRequest.build())
+  }
+
+  @Singleton
+  @Provides
+  fun provideHttpClient(interceptor: Interceptor) : OkHttpClient {
+    val logger = HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY }
     return OkHttpClient.Builder()
       .addInterceptor(logger)
+      .addInterceptor(interceptor)
       .build()
   }
 

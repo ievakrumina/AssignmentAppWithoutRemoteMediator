@@ -141,6 +141,7 @@ class RepoListFragment : Fragment(R.layout.fragment_repo_list), RepoAdapter.OnIt
     binding: FragmentRepoListBinding,
     state: RepoListViewModel.RepoListState.Error
   ) {
+    viewModel.setShouldShowToast(true)
     binding.apply {
       // Handle error states
       if (state.type == RepoListViewModel.LoadingStates.InitialLoad) {
@@ -177,7 +178,7 @@ class RepoListFragment : Fragment(R.layout.fragment_repo_list), RepoAdapter.OnIt
   }
 
   private fun handleNetworkAvailable(repoAdapter: RepoAdapter, status: ConnectivityObserver.Status) {
-    if (viewModel.networkStatus == status) {
+    if (viewModel.networkStatus == status && viewModel.shouldShowOnlineToast) {
       Toast.makeText(context, R.string.network_available, Toast.LENGTH_SHORT).show()
       repoAdapter.retry()
     }

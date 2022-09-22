@@ -37,6 +37,10 @@ class RepoListViewModel @Inject constructor(private val repoListUseCase: RepoLis
   val networkStatus: ConnectivityObserver.Status?
     get() = _networkStatus
 
+  private var _shouldShowOnlineToast: Boolean = false
+  val shouldShowOnlineToast: Boolean
+    get() = _shouldShowOnlineToast
+
   fun setListState(state: CombinedLoadStates) {
     val transformedState = when (state.source.refresh) {
       is LoadState.NotLoading -> {
@@ -70,6 +74,10 @@ class RepoListViewModel @Inject constructor(private val repoListUseCase: RepoLis
    */
   fun setNetworkStatus(status: ConnectivityObserver.Status) {
     _networkStatus = status
+  }
+
+  fun setShouldShowToast(shouldShow: Boolean) {
+    _shouldShowOnlineToast = shouldShow
   }
 
 }
